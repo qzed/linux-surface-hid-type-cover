@@ -10,22 +10,9 @@
 
 static int mstc_ll_start(struct hid_device *hdev)
 {
-	int status;
-
 	hid_info(hdev, "mstc_ll_start\n");
 
-	status = hid_hw_start(hdev->driver_data, HID_CONNECT_DEFAULT);
-	if (status) {
-		return status;
-	}
-
-	status = hid_connect(hdev->driver_data, HID_CONNECT_DEFAULT);
-	if (status) {
-		hid_hw_stop(hdev->driver_data);
-		return status;
-	}
-
-	return 0;
+	return hid_hw_start(hdev->driver_data, HID_CONNECT_DEFAULT);
 }
 
 static void mstc_ll_stop(struct hid_device *hdev)
@@ -298,18 +285,37 @@ static struct hid_device *mstc_create_hid_device(struct hid_device *hdev)
 static int mstc_probe(struct hid_device *hdev, const struct hid_device_id *id)
 {
 	struct hid_device *clone;
+	int status = 0;
 
 	hid_info(hdev, "msct_probe: device: %s, bus: %d\n", hdev->name, hdev->bus);
 
 	clone = mstc_create_hid_device(hdev);
 	if (IS_ERR(clone)) {
-		return PTR_ERR(clone);
+		status = PTR_ERR(clone);
+		goto err_create;
+	}
+
+	status = hid_hw_start(clone, HID_CONNECT_DEFAULT);
+	if (status) {
+		goto err_start;
+	}
+
+	status = hid_add_device(clone);
+	if (status) {
+		goto err_add;
 	}
 
 	hid_set_drvdata(hdev, clone);
 
 	hid_info(hdev, "msct_probe: success");
 	return 0;
+
+err_add:
+	hid_hw_stop(clone);
+err_start:
+	hid_destroy_device(clone);
+err_create:
+	return status;
 }
 
 static void mstc_remove(struct hid_device *hdev)
