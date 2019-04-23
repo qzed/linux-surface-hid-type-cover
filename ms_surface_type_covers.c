@@ -10,9 +10,15 @@
 
 static int mstc_ll_start(struct hid_device *hdev)
 {
+	struct hid_device *orig = hdev->driver_data;
+
 	hid_info(hdev, "mstc_ll_start\n");
 
-	return hid_hw_start(hdev->driver_data, HID_CONNECT_DEFAULT);
+	orig->collection = hdev->collection;
+	orig->collection_size = hdev->collection_size;
+	orig->maxcollection = hdev->maxcollection;
+	orig->maxapplication = hdev->maxapplication;
+	return hid_hw_start(orig, HID_CONNECT_DEFAULT);
 }
 
 static void mstc_ll_stop(struct hid_device *hdev)
