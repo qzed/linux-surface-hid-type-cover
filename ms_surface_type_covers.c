@@ -295,11 +295,6 @@ static int mstc_probe(struct hid_device *hdev, const struct hid_device_id *id)
 		goto err_create;
 	}
 
-	status = hid_hw_start(clone, HID_CONNECT_DEFAULT);
-	if (status) {
-		goto err_start;
-	}
-
 	status = hid_add_device(clone);
 	if (status) {
 		goto err_add;
@@ -311,8 +306,6 @@ static int mstc_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	return 0;
 
 err_add:
-	hid_hw_stop(clone);
-err_start:
 	hid_destroy_device(clone);
 err_create:
 	return status;
