@@ -10,7 +10,20 @@
 
 static int mstc_ll_start(struct hid_device *hdev)
 {
-	return hid_hw_start(hdev->driver_data, HID_CONNECT_DEFAULT);
+	int status;
+
+	status = hid_hw_start(hdev->driver_data, HID_CONNECT_DEFAULT);
+	if (status) {
+		return status;
+	}
+
+	status = hid_connect(hdev->driver_data, HID_CONNECT_DEFAULT);
+	if (status) {
+		hid_hw_stop(hdev->driver_data);
+		return status;
+	}
+
+	return 0;
 }
 
 static void mstc_ll_stop(struct hid_device *hdev)
