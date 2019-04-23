@@ -57,6 +57,7 @@ static int mstc_ll_parse(struct hid_device *hdev)
 		}
 
 		hdev->dev_rdesc = orig->dev_rdesc;
+		hdev->dev_rsize = orig->dev_rsize;
 	}
 
 	return 0;
