@@ -58,17 +58,17 @@ static int mstc_ll_wait(struct hid_device *hdev)
 static int mstc_ll_raw_request(struct hid_device *hdev, unsigned char reportnum,
 			       __u8 *buf, size_t len, unsigned char rtype, int reqtype)
 {
-	return hid_hw_raw_request(hdev, reportnum, buf, len, rtype, reqtype);
+	return hid_hw_raw_request(hdev->driver_data, reportnum, buf, len, rtype, reqtype);
 }
 
 static int mstc_ll_output_report(struct hid_device *hdev, __u8 *buf, size_t len)
 {
-	return hid_hw_output_report(hdev, buf, len);
+	return hid_hw_output_report(hdev->driver_data, buf, len);
 }
 
 static int mstc_ll_idle(struct hid_device *hdev, int report, int idle, int reqtype)
 {
-	return hid_hw_idle(hdev, report, idle, reqtype);
+	return hid_hw_idle(hdev->driver_data, report, idle, reqtype);
 }
 
 struct hid_ll_driver mstc_ll_driver = {
