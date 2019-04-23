@@ -46,11 +46,17 @@ static int mstc_ll_power(struct hid_device *hdev, int level)
 static int mstc_ll_parse(struct hid_device *hdev)
 {
 	struct hid_device *orig = hdev->driver_data;
+	int status;
 
 	hid_info(hdev, "mstc_ll_parse\n");
 
 	if (orig->ll_driver->parse) {
-		return orig->ll_driver->parse(orig);
+		status = orig->ll_driver->parse(orig);
+		if (status) {
+			return status;
+		}
+
+		hdev->dev_rdesc = orig->dev_rdesc;
 	}
 
 	return 0;
