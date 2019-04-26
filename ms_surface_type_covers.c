@@ -124,146 +124,31 @@ struct hid_ll_driver mstc_ll_driver = {
 static int mstc_raw_event(struct hid_device *hdev, struct hid_report *report, u8 *data, int size)
 {
 	struct hid_device *clone = hid_get_drvdata(hdev);
-
-	hid_info(hdev, "mstc_raw_event\n");
-
-	if (clone->driver && clone->driver->raw_event) {
-		return clone->driver->raw_event(clone, report, data, size);
-	}
-
-	return 0;
+	return hid_input_report(hdev, report->type, data, size, 1);
 }
 
 static int mstc_event(struct hid_device *hdev, struct hid_field *field,
 		      struct hid_usage *usage, __s32 value)
 {
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
-	hid_info(hdev, "mstc_event\n");
-
-	if (clone->driver && clone->driver->event) {
-		return clone->driver->event(clone, field, usage, value);
-	}
-
-	return 0;
-}
-
-static void mstc_report(struct hid_device *hdev, struct hid_report *report)
-{
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
-	hid_info(hdev, "mstc_report\n");
-
-	if (clone->driver && clone->driver->report) {
-		clone->driver->report(clone, report);
-	}
-}
-
-static __u8 *mstc_report_fixup(struct hid_device *hdev, __u8 *buf, unsigned int *size)
-{
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
-	hid_info(hdev, "mstc_report_fixup\n");
-
-	if (clone->driver && clone->driver->report_fixup) {
-		return clone->driver->report_fixup(clone, buf, size);
-	}
-
-	return buf;
-}
-
-static int mstc_input_mapping(struct hid_device *hdev, struct hid_input *hidinput,
-			      struct hid_field *field, struct hid_usage *usage,
-			      unsigned long **bit, int *max)
-{
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
-	hid_info(hdev, "mstc_input_mapping\n");
-
-	if (clone->driver && clone->driver->input_mapping) {
-		return clone->driver->input_mapping(clone, hidinput, field, usage, bit, max);
-	}
-
-	return 0;
-}
-
-static int mstc_input_mapped(struct hid_device *hdev, struct hid_input *hidinput,
-			     struct hid_field *field, struct hid_usage *usage,
-			     unsigned long **bit, int *max)
-{
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
-	hid_info(hdev, "mstc_input_mapped\n");
-
-	if (clone->driver && clone->driver->input_mapped) {
-		return clone->driver->input_mapped(clone, hidinput, field, usage, bit, max);
-	}
-
-	return 0;
-}
-
-static int mstc_input_configured(struct hid_device *hdev, struct hid_input *hidinput)
-{
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
-	hid_info(hdev, "mstc_input_configured\n");
-
-	if (clone->driver && clone->driver->input_configured) {
-		return clone->driver->input_configured(clone, hidinput);
-	}
-
-	return 0;
-}
-
-static void mstc_feature_mapping(struct hid_device *hdev, struct hid_field *field,
-				 struct hid_usage *usage)
-{
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
-	hid_info(hdev, "mstc_feature_mapping\n");
-
-	if (clone->driver && clone->driver->feature_mapping) {
-		clone->driver->feature_mapping(clone, field, usage);
-	}
+	return 1;
 }
 
 
 static int mstc_suspend(struct hid_device *hdev, pm_message_t message)
 {
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
 	hid_info(hdev, "mstc_suspend\n");
-
-	if (clone->driver && clone->driver->suspend) {
-		return clone->driver->suspend(clone, message);
-	}
-
 	return 0;
 }
 
 static int mstc_resume(struct hid_device *hdev)
 {
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
 	hid_info(hdev, "mstc_resume\n");
-
-	if (clone->driver && clone->driver->resume) {
-		return clone->driver->resume(clone);
-	}
-
 	return 0;
 }
 
 static int mstc_reset_resume(struct hid_device *hdev)
 {
-	struct hid_device *clone = hid_get_drvdata(hdev);
-
 	hid_info(hdev, "mstc_reset_resume\n");
-
-	if (clone->driver && clone->driver->reset_resume) {
-		return clone->driver->reset_resume(clone);
-	}
-
 	return 0;
 }
 
@@ -344,23 +229,17 @@ MODULE_DEVICE_TABLE(hid, ms_surface_type_cover_ids);
 
 
 struct hid_driver ms_surface_type_cover_driver = {
-	.name             = "hid_ms_surface_type_cover",
-	.id_table         = ms_surface_type_cover_ids,
+	.name         = "hid_ms_surface_type_cover",
+	.id_table     = ms_surface_type_cover_ids,
 
-	.probe            = mstc_probe,
-	.remove           = mstc_remove,
-	.raw_event        = mstc_raw_event,
-	.event            = mstc_event,
-	.report           = mstc_report,
-	.report_fixup     = mstc_report_fixup,
-	.input_mapping    = mstc_input_mapping,
-	.input_mapped     = mstc_input_mapped,
-	.input_configured = mstc_input_configured,
-	.feature_mapping  = mstc_feature_mapping,
+	.probe        = mstc_probe,
+	.remove       = mstc_remove,
+	.raw_event    = mstc_raw_event,
+	.event        = mstc_event,
 
-	.suspend       = mstc_suspend,
-	.resume        = mstc_resume,
-	.reset_resume  = mstc_reset_resume,
+	.suspend      = mstc_suspend,
+	.resume       = mstc_resume,
+	.reset_resume = mstc_reset_resume,
 };
 
 module_hid_driver(ms_surface_type_cover_driver);
